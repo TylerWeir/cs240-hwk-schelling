@@ -31,3 +31,8 @@ td.field {
     border: none;
     width: 150px;
 }
+
+td div {
+	width: 10px;
+	height: 10px;
+}
