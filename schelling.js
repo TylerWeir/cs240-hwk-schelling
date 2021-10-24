@@ -64,6 +64,8 @@ function initBoard(size) {
 function displayBoard(size) {
 	
 	let cells = document.querySelectorAll("div[id=cell]");
+	let popOneColor = document.getElementById("popXcolor").value;
+	let popTwoColor = document.getElementById("popYcolor").value;
 	
 	var x;
 	var y;
@@ -73,14 +75,15 @@ function displayBoard(size) {
 
 		//Style the cell accordingly
 		if (simBoard[x][y] == 1) {
-			cells[i].style.backgroundColor = "blue";
+			cells[i].style.backgroundColor = popOneColor;
 		} else if (simBoard[x][y] == 2) {
-			cells[i].style.backgroundColor = "orange";
+			cells[i].style.backgroundColor = popTwoColor;
 		} else {
 			cells[i].style.backgroundColor = "white";
 		}
 	}
 }
+
 
 
 /////// EVENT LISTENERS ///////
