@@ -94,10 +94,9 @@ function getNeighbors(index, size) {
 	if (size <= 1) {
 		return [];
 	}
-
-	// Working in x y coordinates is easier
-	x = (i+1)%size;
-	y = Math.floor(i/size);
+	
+	let	x = (index)%size;
+	let y = Math.floor(index/size);
 
 	// Holds the indexes of the neighbors
 	var neighbors = [];
@@ -127,21 +126,47 @@ function getNeighbors(index, size) {
 
 	//Edge Case
 	else if (x == 0) {
-
+		//left edge
+		neighbors.push(index-size);
+		neighbors.push(index-size+1);
+		neighbors.push(index+1);
+		neighbors.push(index+size);
+		neighbors.push(index+size+1);
 	} else if (x == size-1) {
-
+		//right edge
+		neighbors.push(index-size-1);
+		neighbors.push(index-size);
+		neighbors.push(index-1);
+		neighbors.push(index+size-1);
+		neighbors.push(index+size);
 	} else if (y == 0) {
-
+		//top edge	
+		neighbors.push(index-1);
+		neighbors.push(index+1);
+		neighbors.push(index+size-1);
+		neighbors.push(index+size);
+		neighbors.push(index+size+1);
 	} else if (y == size-1) {
-
+		//bottom edge	
+		neighbors.push(index-1);
+		neighbors.push(index+1);
+		neighbors.push(index-size-1);
+		neighbors.push(index-size);
+		neighbors.push(index-size+1);
 	}
 
 	// Middle case
-	else {
-		
-
+	else if (x > 0 && x < size && y > 0 && y < size ) {
+		neighbors.push(index-1);
+		neighbors.push(index+1);
+		neighbors.push(index+size-1);
+		neighbors.push(index+size);
+		neighbors.push(index+size+1);
+		neighbors.push(index-size-1);
+		neighbors.push(index-size);
+		neighbors.push(index-size+1);
 	}
-	
+	return neighbors;
 }
 
 
