@@ -70,7 +70,7 @@ function displayBoard(size) {
 	var x;
 	var y;
 	for (let i = 0; i < cells.length; i++) {
-		x = (i+1)%size;
+		x = (i)%size;
 		y = Math.floor(i/size);
 
 		//Style the cell accordingly
