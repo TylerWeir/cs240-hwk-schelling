@@ -84,6 +84,67 @@ function displayBoard(size) {
 	}
 }
 
+/**
+ * Returns a list of the indeces of neighboring cells.
+ *
+ * TODO: Need to optimize how searches are made.
+ */
+function getNeighbors(index, size) {
+	// Check to make sure the board isn't too small
+	if (size <= 1) {
+		return [];
+	}
+
+	// Working in x y coordinates is easier
+	x = (i+1)%size;
+	y = Math.floor(i/size);
+
+	// Holds the indexes of the neighbors
+	var neighbors = [];
+
+	//Corner Case -- Very specific. Would be more efficient if checked last
+	if (x == 0 && y == 0) {
+		// Top left
+		neighbors.push(1);
+		neighbors.push(size);
+		neighbors.push(size+1);
+	} else if (x == 0 && y == size-1) {
+		// Bottom left
+		neighbors.push(index-size);
+		neighbors.push(index-size+1);
+		neighbors.push(index+1);
+	} else if (x == size-1 && y == 0) {
+		// Top right
+		neighbors.push(index-1);
+		neighbors.push(index+size-1);
+		neighbors.push(index+size);
+	} else if (x == size-1 && y == size-1) {
+		// Bottom right
+		neighbors.push(index-size-1);
+		neighbors.push(index-size);
+		neighbors.push(index-1);
+	}
+
+	//Edge Case
+	else if (x == 0) {
+
+	} else if (x == size-1) {
+
+	} else if (y == 0) {
+
+	} else if (y == size-1) {
+
+	}
+
+	// Middle case
+	else {
+		
+
+	}
+	
+}
+
+
 
 
 /////// EVENT LISTENERS ///////
