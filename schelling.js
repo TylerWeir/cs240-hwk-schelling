@@ -9,6 +9,7 @@ const cell = "<div id='cell'></div>"
 // Global Variables
 var simBoard = [];
 var running = false;
+var generations = 0;
 
 /**
  * Creates the table based on the parameters set by the user. 
@@ -35,6 +36,7 @@ function createTable(size) {
  */
 function initBoard(size) {
 	simBoard = [];
+	generations = 0;
 
 	let popSplit = document.getElementById("popRatio").value;
 	let numVacant = document.getElementById("vacantRatio").value;
@@ -267,9 +269,13 @@ function cycleBoard () {
 	if (getFreeCells().length == 0) {
 		return;
 	}
+	
+	var allHappy = true;
+
 	// Go through all the cells in the board
 	for(let i = 0; i < size**2; i++) {
 		if( !isHappy(i) ) {
+			allHappy = false;
 		//console.log("Index " + i + " is NOT HAPPY");
 		// Swap if not happy
 		var freeCells = getFreeCells();
@@ -289,6 +295,13 @@ function cycleBoard () {
 		}
 	}
 
+	generations ++;
+	document.querySelector('p').innerHTML = "Generations: " + generations;
+
+	if (allHappy) {
+		running = false;
+		document.getElementById("runstop").innerHTML = "Run";
+	}
 	displayBoard();
 }
 
@@ -314,8 +327,8 @@ let randomize = document.getElementById("randomize");
 randomize.addEventListener("click", buildBoard);
 
 let run = document.getElementById("runstop");
-run.addEventListener("click",async function(){
-	console.log("Clicked");
+run.addEventListener("click", async function(){
+	run.innerHTML = "Stop";
 	if(running == true) {
 		running = false;
 	} else {
@@ -328,6 +341,7 @@ run.addEventListener("click",async function(){
 			);
 			cycleBoard();
 		}
+		run.innerHTML = "Run";
 	}
 });
 
