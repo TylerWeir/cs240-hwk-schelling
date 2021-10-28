@@ -7,7 +7,8 @@
 const cell = "<div id='cell'></div>"
 
 // Global Variables
-var simBoard; 
+var simBoard = [];
+var running = false;
 
 /**
  * Creates the table based on the parameters set by the user. 
@@ -61,8 +62,9 @@ function initBoard(size) {
 /**
  * Makes the displayed board represent the simBoard.
  */
-function displayBoard(size) {
-	
+function displayBoard() {
+		
+	let size = parseInt(document.getElementById("dimension").value);
 	let cells = document.querySelectorAll("div[id=cell]");
 	let popOneColor = document.getElementById("popXcolor").value;
 	let popTwoColor = document.getElementById("popYcolor").value;
@@ -87,7 +89,7 @@ function displayBoard(size) {
 /**
  * Returns a list of the indeces of neighboring cells.
  *
- * TODO: Need to optimize how searches are made.
+ * TODO: Gross! There are better ways to do this. 
  */
 function getNeighbors(index, size) {
 	// Check to make sure the board isn't too small
@@ -98,15 +100,21 @@ function getNeighbors(index, size) {
 	let	x = (index)%size;
 	let y = Math.floor(index/size);
 
+//	console.log("X: " + x);
+	//console.log("Y: " + y);
+
 	// Holds the indexes of the neighbors
-	var neighbors = [];
+	let neighbors = [];
 
 	//Corner Case -- Very specific. Would be more efficient if checked last
 	if (x == 0 && y == 0) {
 		// Top left
+		//console.log("CornerCase");
 		neighbors.push(1);
 		neighbors.push(size);
 		neighbors.push(size+1);
+
+		//console.log(neighbors);
 	} else if (x == 0 && y == size-1) {
 		// Bottom left
 		neighbors.push(index-size);
@@ -123,7 +131,6 @@ function getNeighbors(index, size) {
 		neighbors.push(index-size);
 		neighbors.push(index-1);
 	}
-
 	//Edge Case
 	else if (x == 0) {
 		//left edge
@@ -166,28 +173,170 @@ function getNeighbors(index, size) {
 		neighbors.push(index-size);
 		neighbors.push(index-size+1);
 	}
+	
+	//console.log("getNeighbors is returning: " + neighbors);
 	return neighbors;
 }
 
+/**
+ * Gets the indecies of the free cells.
+ *
+ * @returns {num[]} freeCells	Indices of free cells
+ */
+function getFreeCells () {
+	let size = parseInt(document.getElementById("dimension").value);
 
+	var freeCellIndices = [];
+
+	for (let i = 0; i < simBoard.length**2; i++) {
+		let	x = (i)%size;
+		let y = Math.floor(i/size);
+		////console.log('x == ' +x);
+		//console.log('y == ' +y);
+		//console.log();
+		if (simBoard[x][y] == 0) {
+			freeCellIndices.push(i);
+		}
+	}
+	
+	return freeCellIndices;
+}
+
+/**
+ * Checks if a cell is happy in it's position. 
+ * Returns true if the cell is statisfied, false if not. 
+ */
+function isHappy(index) {
+	let size = parseInt(document.getElementById("dimension").value);
+	let tolerence = parseFloat(document.getElementById("threshold").value);
+	//console.log(index);
+	let neighbors = getNeighbors(index, size);
+
+	let xTmp = index%size;
+	let yTmp = Math.floor(index/size);
+	let type = simBoard[xTmp][yTmp];
+
+	if (type == 0) {
+		//console.log("This cell is empty.");
+		return true;
+	}
+
+	var numSame = 0;	 	
+	var numDiff = 0;
+	var nType;
+
+	
+	//console.log("neighbors :" + neighbors);
+	for (let i = 0; i < neighbors.length; i++) {
+		let nbr = neighbors[i];	
+		//console.log("Checking neighbor: " + nbr);
+		let	x = (nbr)%size;
+		let y = Math.floor(nbr/size);
+
+		if (simBoard[x][y] == type) {
+			//console.log("Same neighbor: " + nbr);
+			numSame++;
+		} else if (simBoard[x][y] != type && simBoard[x][y] != 0) {
+			//console.log("Different neighbor: " + nbr);
+			// Filter out empty cells
+			numDiff++;
+		}
+	}
+
+	// Check for divide by zero error
+	if (numDiff == 0) {
+		return true;
+	}
+	
+	
+	var ratio = numSame/(numSame+numDiff);
+	//console.log("The ratio is " + ratio);
+	if (ratio > tolerence) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Runs through each cell in the board, moving unstatisfied cells to a new random free cell. 
+ */
+function cycleBoard () {
+	let size = parseInt(document.getElementById("dimension").value);
+
+	if (getFreeCells().length == 0) {
+		return;
+	}
+	// Go through all the cells in the board
+	for(let i = 0; i < size**2; i++) {
+		if( !isHappy(i) ) {
+		//console.log("Index " + i + " is NOT HAPPY");
+		// Swap if not happy
+		var freeCells = getFreeCells();
+		//console.log("Here are the free locations: " + freeCells);
+		//console.log(freeCells.length);
+		var target = Math.floor(Math.random()*freeCells.length);
+		var newIndex = freeCells[target];
+		//console.log("Moving " + i + " to " + newIndex);
+
+		let	xNew = (newIndex)%size;
+		let yNew = Math.floor(newIndex/size);
+		let	xOld = (i)%size;
+		let yOld = Math.floor(i/size);
+		simBoard[xNew][yNew] = simBoard[xOld][yOld];
+		simBoard[xOld][yOld] = 0;
+
+		}
+	}
+
+	displayBoard();
+}
+
+/**
+ * Builds both the front end and the back end board based on the values contained in the fields. 
+ */
+function buildBoard () {
+	let size = parseInt(document.getElementById("dimension").value);
+	createTable(size);
+	initBoard(size);
+	displayBoard();
+}
 
 
 /////// EVENT LISTENERS ///////
 
 // Resize board when 'Dimension' changes
 let dimension = document.getElementById("dimension");
-dimension.addEventListener("change", function () {
-	let size = document.getElementById("dimension").value;
-	createTable(size);
-	initBoard(size);
-	displayBoard(size);
+dimension.addEventListener("change", buildBoard);
+
+
+let randomize = document.getElementById("randomize");
+randomize.addEventListener("click", buildBoard);
+
+let run = document.getElementById("runstop");
+run.addEventListener("click",async function(){
+	console.log("Clicked");
+	if(running == true) {
+		running = false;
+	} else {
+		running = true;
+		while (running) {
+			await new Promise((resolve) =>
+				setTimeout(() => {
+					resolve();
+				}, 100)
+			);
+			cycleBoard();
+		}
+	}
 });
 
 
 
-// Change population colors
+// Build board on start up
+buildBoard();
 
-//
+
 
 
 
